@@ -178,6 +178,7 @@ fi
         echo "========================================="
         echo " 🌍 Windows 11 QEMU + noVNC ready:"
         echo "     $URL/vnc.html"
+        echo "     $URL/vnc.html" > /home/user/idx-windows-gui/noVNC-URL.txt
         echo "========================================="
       else
         echo "❌ Cloudflared tunnel failed"
