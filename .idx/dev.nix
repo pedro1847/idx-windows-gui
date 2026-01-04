@@ -114,32 +114,27 @@
       # =========================
       echo "Starting QEMU..."
       nohup qemu-system-x86_64 \
-        -enable-kvm \
-        -machine type=q35,accel=kvm \
-        -cpu host \
-        -m 28672 \
-        -smp 8 \
-        \
-        -drive if=pflash,format=raw,readonly=on,file=$OVMF_CODE \
-        -drive if=pflash,format=raw,file=$OVMF_VARS \
-        \
-        -drive file="$RAW_DISK",format=qcow2,if=none,id=vdisk \
-        -device virtio-blk-pci,drive=vdisk \
-        \
-        -drive file="$WIN_ISO",media=cdrom,if=none,id=cd1 \
-        -drive file="$VIRTIO_ISO",media=cdrom,if=none,id=cd2 \
-        \
-        -boot menu=on,order=cd \
-        \
-        -netdev user,id=net0 \
-        -device virtio-net-pci,netdev=net0 \
-        \
-        -device virtio-vga \
-        \
-        -vnc :0 \
-        -display none \
-        \
-        > /tmp/qemu.log 2>&1 &
+  -enable-kvm \
+  -machine type=q35,accel=kvm \
+  -cpu host \
+  -m 28672 \
+  -smp 8 \
+  -drive if=pflash,format=raw,readonly=on,file="$OVMF_CODE" \
+  -drive if=pflash,format=raw,file="$OVMF_VARS" \
+  -drive file="$RAW_DISK",format=qcow2,if=none,id=vdisk \
+  -device virtio-blk-pci,drive=vdisk \
+  -drive file="$WIN_ISO",media=cdrom,if=none,id=cd1 \
+  -device ide-cd,bus=ide.0,drive=cd1,bootindex=0 \
+  -drive file="$VIRTIO_ISO",media=cdrom,if=none,id=cd2 \
+  -device ide-cd,bus=ide.1,drive=cd2 \
+  -boot menu=on,order=cd \
+  -netdev user,id=net0 \
+  -device virtio-net-pci,netdev=net0 \
+  -device virtio-vga \
+  -vnc :0 \
+  -display none \
+  > /tmp/qemu.log 2>&1 &
+
 
       # =========================
       # Start noVNC on port 8888
