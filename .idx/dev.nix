@@ -3,6 +3,7 @@
 
   packages = [
     pkgs.qemu
+    pkgs.ovmf
     pkgs.htop
     pkgs.cloudflared
     pkgs.coreutils
@@ -33,7 +34,7 @@
       # Paths
       # =========================
       VM_DIR="$HOME/qemu"
-      RAW_DISK="$VM_DIR/windows.raw"
+      RAW_DISK="$VM_DIR/windows.qcow2"
       WIN_ISO="$VM_DIR/automic11.iso"
       VIRTIO_ISO="$VM_DIR/virtio-win.iso"
       NOVNC_DIR="$HOME/noVNC"
@@ -41,10 +42,7 @@
       OVMF_CODE="${pkgs.ovmf}/share/OVMF/OVMF_CODE.fd"
       OVMF_VARS="${pkgs.ovmf}/share/OVMF/OVMF_VARS.fd"
 
-
-
       mkdir -p "$VM_DIR"
-      
 
       # =========================
       # Download Windows ISO if missing
@@ -69,7 +67,7 @@
       fi
 
       # =========================
-      # Clone noVNC if missing, else skip
+      # Clone noVNC if missing
       # =========================
       if [ ! -d "$NOVNC_DIR/.git" ]; then
         echo "Cloning noVNC..."
@@ -80,17 +78,17 @@
       fi
 
       # =========================
-      # Create RAW disk if missing
+      # Create QCOW2 disk if missing
       # =========================
       if [ ! -f "$RAW_DISK" ]; then
-        echo "Creating RAW disk..."
-        qemu-img create -f raw "$RAW_DISK" 11G
+        echo "Creating QCOW2 disk..."
+        qemu-img create -f qcow2 "$RAW_DISK" 11G
       else
-        echo "RAW disk already exists, skipping creation."
+        echo "QCOW2 disk already exists, skipping creation."
       fi
 
       # =========================
-      # Start QEMU (KVM + VirtIO)
+      # Start QEMU (KVM + VirtIO + UEFI)
       # =========================
       echo "Starting QEMU..."
       nohup qemu-system-x86_64 \
@@ -100,32 +98,36 @@
         -m 28672 \
         -smp 8 \
         \
-        -drive file="$RAW_DISK",format=raw,if=none,id=vdisk \
-        -device virtio-blk-pci,drive=vdisk \
-        \
-        -drive file="$WIN_ISO",media=cdrom,if=none,id=cd1 \
-        -device ide-cd,drive=cd1,bus=ide.0 \
-        \
-        -drive file="$VIRTIO_ISO",media=cdrom,if=none,id=cd2 \
-        -device ide-cd,drive=cd2,bus=ide.1 \
-        \
+        # UEFI firmware
         -drive if=pflash,format=raw,readonly=on,file=$OVMF_CODE \
         -drive if=pflash,format=raw,file=$OVMF_VARS \
         \
-        -boot order=d \
+        # VirtIO disk
+        -drive file="$RAW_DISK",format=qcow2,if=virtio,id=vdisk \
+        -device virtio-blk-pci,drive=vdisk \
         \
+        # Windows ISO + VirtIO ISO as virtio CD-ROM
+        -drive file="$WIN_ISO",media=cdrom,if=virtio,id=cd1 \
+        -drive file="$VIRTIO_ISO",media=cdrom,if=virtio,id=cd2 \
+        \
+        # Boot menu enabled
+        -boot menu=on,order=cd \
+        \
+        # Networking
         -netdev user,id=net0 \
         -device virtio-net-pci,netdev=net0 \
         \
+        # Video
         -device virtio-vga \
         \
+        # VNC for noVNC
         -vnc :0 \
         -display none \
         \
         > /tmp/qemu.log 2>&1 &
 
       # =========================
-      # Start noVNC (port 8888)
+      # Start noVNC on port 8888
       # =========================
       echo "Starting noVNC..."
       nohup "$NOVNC_DIR/utils/novnc_proxy" \
@@ -147,7 +149,7 @@
       if grep -q "trycloudflare.com" /tmp/cloudflared.log; then
         URL=$(grep -o "https://[a-z0-9.-]*trycloudflare.com" /tmp/cloudflared.log | head -n1)
         echo "========================================="
-        echo " 🌍 Windows QEMU + noVNC ready:"
+        echo " 🌍 Windows 11 QEMU + noVNC ready:"
         echo "     $URL/vnc.html"
         echo "========================================="
       else
