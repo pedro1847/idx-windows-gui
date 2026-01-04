@@ -127,7 +127,7 @@
         URL=$(grep -o "https://[a-z0-9.-]*trycloudflare.com" /tmp/cloudflared.log | head -n1)
         echo "========================================="
         echo " 🌍 Windows QEMU + noVNC ready:"
-        echo "     $URL"
+        echo "     $URL/vnc.html"
         echo "========================================="
       else
         echo "❌ Cloudflared tunnel failed"
