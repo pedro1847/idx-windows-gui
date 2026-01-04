@@ -121,7 +121,7 @@
   -smp 8 \
   -drive if=pflash,format=raw,readonly=on,file="$OVMF_CODE" \
   -drive if=pflash,format=raw,file="$OVMF_VARS" \
-  -drive file="$RAW_DISK",format=qcow2,if=none,id=vdisk \
+  -drive file="$RAW_DISK",format=qcow2,if=virtio \
   -device virtio-blk-pci,drive=vdisk \
   -drive file="$WIN_ISO",media=cdrom,if=none,id=cd1 \
   -device ide-cd,bus=ide.0,drive=cd1,bootindex=0 \
