@@ -87,7 +87,7 @@ fi
       if [ ! -f "$WIN_ISO" ]; then
         echo "Downloading Windows ISO..."
         wget -O "$WIN_ISO" \
-          https://github.com/kmille36/idx-windows-gui/releases/download/1.0/automic11.iso
+          https://archive.org/download/Windows7_x86-x64_ptBR_Pack_MSDN/pt_windows_7_professional_with_sp1_x64_dvd_u_676950.iso
       else
         echo "Windows ISO already exists, skipping download."
       fi
@@ -119,7 +119,7 @@ fi
       # =========================
       if [ ! -f "$RAW_DISK" ]; then
         echo "Creating QCOW2 disk..."
-        qemu-img create -f qcow2 "$RAW_DISK" 11G
+        qemu-img create -f qcow2 "$RAW_DISK" 30G
       else
         echo "QCOW2 disk already exists, skipping creation."
       fi
@@ -134,7 +134,7 @@ fi
   -smp 8,cores=8 \
   -M q35,usb=on \
   -device usb-tablet \
-  -m 49152 \
+  -m 28672 \
   -device virtio-balloon-pci \
   -vga virtio \
   -net nic,netdev=n0,model=virtio-net-pci \
