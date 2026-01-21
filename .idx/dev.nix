@@ -119,7 +119,7 @@ fi
       # =========================
       if [ ! -f "$RAW_DISK" ]; then
         echo "Creating QCOW2 disk..."
-        qemu-img create -f qcow2 "$RAW_DISK" 11G
+        qemu-img create -f qcow2 "$RAW_DISK" 50G
       else
         echo "QCOW2 disk already exists, skipping creation."
       fi
@@ -134,7 +134,7 @@ fi
   -smp 8,cores=8 \
   -M q35,usb=on \
   -device usb-tablet \
-  -m 28672 \
+  -m 49152 \
   -device virtio-balloon-pci \
   -vga virtio \
   -net nic,netdev=n0,model=virtio-net-pci \
