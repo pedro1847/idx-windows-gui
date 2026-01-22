@@ -72,7 +72,7 @@
       if [ "$SKIP_QCOW2_DOWNLOAD" -ne 1 ]; then
   if [ ! -f "$RAW_DISK" ]; then
     echo "Downloading QCOW2 disk..."
-    wget -O "$RAW_DISK" https://bit.ly/45hceMn
+    wget -O "$RAW_DISK" https://download2357.mediafire.com/rnlm81c0tlngF6HjJDkvxXn-XK_TzhS_028RPh6yIi-BnL5Z_On_nWkbV-7E2axdcwTR5bSerk5jgtl0FwIWtqhjbTFk7LLYszDTEt0eU0Al0SB-TshnGZdIQ69AZq-NyCQzIfOGumcaIBQsmVEqzXkOVC70QkDKIRWKTMpHv9Oslzo/qltz6n680wwtz3r/w7.qcow2
   else
     echo "QCOW2 disk already exists, skipping download."
   fi
